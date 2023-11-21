@@ -1,7 +1,8 @@
-import { AccountUpdate, Mina, PrivateKey, PublicKey, fetchAccount } from 'o1js';
+import { Mina, PrivateKey, PublicKey, fetchAccount } from 'o1js';
 import { TokenElection } from './TokenElection.js';
 import fs from 'fs/promises';
 import { ZKAPP_ADDRESS } from './constants.js';
+
 
 let deployAlias = 'berkeley'
 Error.stackTraceLimit = 1000;
@@ -29,36 +30,36 @@ let feepayerKey = PrivateKey.fromBase58(feepayerKeysBase58.privateKey);
 let feepayerAddress = feepayerKey.toPublicKey();
 
 // set up Mina instance and contract we interact with
-const Network = Mina.Network(config.url);
+const Network = Mina.Network({
+  mina: config.url,
+  archive: 'https://archive.berkeley.minaexplorer.com'
+})
 const fee = Number(config.fee) * 1e9; // in nanomina (1 billion = 1.0 mina)
 Mina.setActiveInstance(Network);
 let zkAppAddress = PublicKey.fromBase58(ZKAPP_ADDRESS)
 let zkApp = new TokenElection(zkAppAddress);
 await fetchAccount({ publicKey: zkAppAddress });
 
-let sentTx;
 // compile the contract to create prover keys
 console.log('compile the contract...');
 await TokenElection.compile();
+let reduceTx;
 try {
   // Join the election by minting tokens to yourself
-  console.log('build transaction and create proof...');
   let tx = await Mina.transaction({ sender: feepayerAddress, fee }, () => {
-    let senderUpdate = AccountUpdate.fundNewAccount(feepayerAddress);
-    zkApp.faucet(feepayerAddress);
+    zkApp.reduceVotes();
   });
   await tx.prove();
-  console.log('send transaction...');
-  sentTx = await tx.sign([feepayerKey]).send();
+  reduceTx = await tx.sign([feepayerKey]).send();
 } catch (err) {
   console.log(err);
 }
-if (sentTx?.hash() !== undefined) {
+if (reduceTx?.hash() !== undefined) {
   console.log(`
 Success! Update transaction sent.
 
 Your smart contract state will be updated
 as soon as the transaction is included in a block:
-https://berkeley.minaexplorer.com/transaction/${sentTx.hash()}
+https://berkeley.minaexplorer.com/transaction/${reduceTx.hash()}
 `);
 }

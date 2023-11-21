@@ -1,4 +1,4 @@
-import { SmartContract, state, State, method, UInt32, AccountUpdate, UInt64, Reducer, Field, PublicKey, Struct, Provable } from 'o1js';
+import { SmartContract, state, State, method, UInt32, UInt64, Reducer, Field, PublicKey, Struct } from 'o1js';
 import { PackedUInt32Factory, MultiPackedStringFactory } from 'o1js-pack';
 
 export class IpfsHash extends MultiPackedStringFactory(4) { }

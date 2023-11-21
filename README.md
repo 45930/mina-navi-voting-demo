@@ -22,11 +22,11 @@ Used for concurrent updates.  This allows multiple users to cast a vote during t
 npm i
 ```
 
-### Add your Mina account
-If you have an account funded on the Berkeley network, feel free to manually add the keys to the `keys/` folder.  Otherwise
+### Get a Mina account
+Use the zkapp-cli to configure a new wallet, and use the faucet to fund it on Berkeley
 
 ```sh
-zk config
+zk config # name the network alias 'berkeley' so it will work with the demo, graphQL url https://proxy.berkeley.minaexplorer.com/graphql
 ```
 
 Make sure your account is funded before continuing.
@@ -50,6 +50,14 @@ After you've reviewed the options, edit the file `src/votes.json` with your pref
 ```sh
 npm run build
 node ./build/src/submitVotes.js
+```
+
+### Reduce the actions
+If too many actions get added before someone calls the reducer, then the contract will become bricked.  For this demo, please be a good citizen and reduce the action state after your transaction!
+
+```sh
+npm run build
+node ./build/src/reduce.js
 ```
 
 Congratulations, you just submitted your vote!

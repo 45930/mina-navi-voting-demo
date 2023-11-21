@@ -1,0 +1,1 @@
+export const ZKAPP_ADDRESS = 'B62qnZTn9S5oNPk8j8e4DpZohTvmUUH53e2khDnVtYTKkBAuekfutAn';
